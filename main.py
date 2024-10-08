@@ -1,13 +1,6 @@
 # copyright 2023 © Xron Trix | https://github.com/Xrontrix10
 
-
 # @title 🖥️ Main Colab Leech Code
-
-# @title Main Code
-# @markdown <div><center><img src="https://user-images.githubusercontent.com/125879861/255391401-371f3a64-732d-4954-ac0f-4f093a6605e1.png" height=80></center></div>
-# @markdown <center><h4><a href="https://github.com/XronTrix10/Telegram-Leecher/wiki/INSTRUCTIONS">READ</a> How to use</h4></center>
-
-# @markdown <br>
 
 API_ID = 0  # @param {type: "integer"}
 API_HASH = ""  # @param {type: "string"}
@@ -15,15 +8,14 @@ BOT_TOKEN = ""  # @param {type: "string"}
 USER_ID = 0  # @param {type: "integer"}
 DUMP_ID = 0  # @param {type: "integer"}
 
-
 import subprocess, time, json, shutil, os
 from IPython.display import clear_output
 from threading import Thread
+from colab_leecher.downloader.aria2 import aria2_Download
 
 Working = True
 
 banner = '''
-
  ____   ____.______  ._______  .______       _____._.______  .___  ____   ____
  \\   \\_/   /: __   \\ : .___  \\ :      \\      \\__ _:|: __   \\ : __| \\   \\_/   /
   \\___ ___/ |  \\____|| :   |  ||       |       |  :||  \\____|| : |  \\___ ___/ 
@@ -53,7 +45,6 @@ def Loading():
         white = (white -1) if white != 0 else 37
         time.sleep(2)
     clear_output()
-
 
 _Thread = Thread(target=Loading, name="Prepare", args=())
 _Thread.start()
@@ -87,7 +78,22 @@ Working = False
 
 if os.path.exists("/content/Telegram-Leecher/my_bot.session"):
     os.remove("/content/Telegram-Leecher/my_bot.session") # Remove previous bot session
-    
+
 print("\rStarting Bot....")
+
+# Download logic - Adjusted for torrents
+def start_download(link, download_num):
+    if link.endswith(".torrent") or link.startswith("magnet:?"):
+        print(f"Starting torrent download for {link}")
+    else:
+        print(f"Starting regular download for {link}")
+    
+    # Call aria2_Download for both regular and torrent downloads
+    aria2_Download(link, download_num)
+
+# Example download execution
+download_link = "<your download link or magnet/torrent here>"
+download_num = 1
+start_download(download_link, download_num)
 
 !cd /content/Telegram-Leecher/ && python3 -m colab_leecher #type:ignore
