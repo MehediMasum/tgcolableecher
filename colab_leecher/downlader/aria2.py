@@ -1,6 +1,3 @@
-# copyright 2023 © Xron Trix | https://github.com/Xrontrix10
-
-
 import re
 import logging
 import subprocess
@@ -8,25 +5,35 @@ from datetime import datetime
 from colab_leecher.utility.helper import sizeUnit, status_bar
 from colab_leecher.utility.variables import BOT, Aria2c, Paths, Messages, BotTimes
 
-
 async def aria2_Download(link: str, num: int):
     global BotTimes, Messages
     name_d = get_Aria2c_Name(link)
     BotTimes.task_start = datetime.now()
-    Messages.status_head = f"<b>📥 DOWNLOADING FROM » </b><i>🔗Link {str(num).zfill(2)}</i>\n\n<b>🏷️ Name » </b><code>{name_d}</code>\n"
-
-    # Create a command to run aria2p with the link
-    command = [
-        "aria2c",
-        "-x16",
-        "--seed-time=0",
-        "--summary-interval=1",
-        "--max-tries=3",
-        "--console-log-level=notice",
-        "-d",
-        Paths.down_path,
-        link,
-    ]
+    
+    # Check if the link is a torrent file or a magnet link
+    if link.endswith(".torrent") or link.startswith("magnet:?"):
+        Messages.status_head = f"<b>📥 DOWNLOADING TORRENT » </b><i>🔗Link {str(num).zfill(2)}</i>\n\n<b>🏷️ Name » </b><code>{name_d}</code>\n"
+        # Adjust command for torrents
+        command = [
+            "aria2c",
+            "--seed-time=0",  # Disable seeding after download
+            "-T", link if link.endswith(".torrent") else link,  # Torrent or magnet link
+            "-d", Paths.down_path,
+        ]
+    else:
+        Messages.status_head = f"<b>📥 DOWNLOADING FROM » </b><i>🔗Link {str(num).zfill(2)}</i>\n\n<b>🏷️ Name » </b><code>{name_d}</code>\n"
+        # Original command for regular downloads
+        command = [
+            "aria2c",
+            "-x16",
+            "--seed-time=0",
+            "--summary-interval=1",
+            "--max-tries=3",
+            "--console-log-level=notice",
+            "-d",
+            Paths.down_path,
+            link,
+        ]
 
     # Run the command using subprocess.Popen
     proc = subprocess.Popen(
